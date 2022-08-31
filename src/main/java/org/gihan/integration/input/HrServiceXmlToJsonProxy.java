@@ -43,7 +43,7 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 	@GetMapping("/test")
 	public String test(){
 		System.out.printf("\n\nTest func called");
-		return "Hello Demo user";
+		return "Hi Demo user";
 	}
 
 	@GetMapping("/hello/{user}")
