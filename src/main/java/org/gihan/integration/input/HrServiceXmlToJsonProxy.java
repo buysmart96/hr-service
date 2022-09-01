@@ -49,7 +49,7 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 	@GetMapping("/hello/{user}")
 	public String healthCheck(@PathVariable String user) {
 		System.out.println("Hello " + user);
-		return "Hi,Good morning " +  user + " " +new Date().toString();
+		return "hello Demo user,Good morning " +  user + " " +new Date().toString();
 	}
 
 
