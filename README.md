@@ -56,6 +56,6 @@ _NOTE:container port should be the one mentioned in the properties file._
 
 
 # How to deploy to Codeobe platform?
-#added line for testing
+#I dont' know,, huhih
 
 
