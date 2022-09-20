@@ -43,13 +43,13 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 	@GetMapping("/test")
 	public String test(){
 		System.out.printf("\n\nTest func called");
-		return "Hello user";
+		return "Hello Test";
 	}
 
 	@GetMapping("/hello/{user}")
 	public String healthCheck(@PathVariable String user) {
 		System.out.println("Hello " + user);
-		return "hello Demo user,Good morning " +  user + " " +new Date().toString();
+		return "Hello " +  user + " " +new Date().toString();
 	}
 
 
@@ -60,20 +60,25 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 		peid = UUID.randomUUID().toString();
 
 		try{
-			codeobeLog.logMessageBeforeProcess(request,peid);
+			codeobeLog.logMessageBeforeProcess(request,peid,false);
 		}catch (Exception e){
 			System.out.println("\nLogging Error : Log Message Before Error..\n\n");
 		}
 
 //		System.out.println("\n\nIm here");
-		List<String> responseList = processAndSend(request,peid);
+		List<String> responseList = processAndSend(request,peid , false);
 
 		return responseList;
 	}
 
 
 	@Override
-	public List<String> processAndSend(String msg, String peid) {
+	public List<String> processAndSend(String msg, String peid, boolean isManual) {
+//		try{
+//			codeobeLog.logMessageBeforeProcess(msg,peid,isManual);
+//		}catch (Exception e){
+//			System.out.println("\nLogging Error : Log Message Before Error..\n\n");
+//		}
 
 		System.out.println("2. Start processing request =" + msg);
 
@@ -86,7 +91,7 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 
 
 				try{
-					codeobeLog.logMessageAfterProcess(employee, peid); //send to Q
+					codeobeLog.logMessageAfterProcess(employee, peid,isManual); //send to Q
 				}catch (Exception e){
 					System.out.println("\nLogging Error: Log Message After Process..\n\n");
 				}
@@ -97,7 +102,7 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 			System.out.println("2.2 Processing employee error=" + msg);
 
 			try{
-				codeobeLog.logProcessingError("Invalid Request", peid); //send to q
+				codeobeLog.logProcessingError("Invalid Request", peid,isManual); //send to q
 			}catch (Exception e){
 				System.out.println("\nLogging Error: Log Error After Process..\n\n");
 			}
@@ -107,13 +112,13 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 		
 		//Make sure you call send method from process to make it work for resends.replays
 		System.out.println("Um in end of the sendAndProcess func");
-		List<String> results  = send(processedList, peid);
+		List<String> results  = send(processedList, peid,isManual);
 		return results;
 	}
 	
 	
 	@Override
-	public List<String> send(List<String> processedList, String peid)  {
+	public List<String> send(List<String> processedList, String peid, boolean isManual)  {
 		
 		List<String> reponseList = new ArrayList<String>();
 		for (String msg  : processedList)  {
@@ -134,19 +139,20 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 			    if (response != null && response.getStatusLine().getStatusCode() == 200) {
 			    	tmOut = EntityUtils.toString(response.getEntity());
 
+					System.out.println("3.1 logResponse ....." + "tmout : " + tmOut );
 					try{
-						codeobeLog.logResponse(tmOut, peid);
+						codeobeLog.logResponse(tmOut, peid,isManual);
 					}catch (Exception e){
 						System.out.println("\nLogging Error: Log Response.\n\n");
 					}
 
 
-					System.out.println("3.1 logResponse ....." );
+
 			    } else {
 			    	tmOut = "Error from endpoint";
 
 					try{
-						codeobeLog.logResponseError(tmOut, peid);
+						codeobeLog.logResponseError(tmOut, peid,isManual);
 					}catch (Exception e){
 						System.out.println("\nLogging Error: Log Response Error.\n\n");
 					}
@@ -158,7 +164,7 @@ public class HrServiceXmlToJsonProxy extends CodeobeListener {
 		    	tmOut = "Error sending message out";
 
 				try{
-					codeobeLog.logResponseError(tmOut, peid);
+					codeobeLog.logResponseError(tmOut, peid,isManual);
 				}catch (Exception e){
 					System.out.println("\nLogging Error: Log Response Error.\n\n");
 				}
